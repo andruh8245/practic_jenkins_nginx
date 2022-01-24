@@ -2,9 +2,7 @@ FROM nginx
 
 WORKDIR /app
 
+COPY index.html /usr/share/nginx/html
 COPY . .
-COPY default.conf /etc/nginx/conf.d/
-COPY index.html /html
-
 
 
