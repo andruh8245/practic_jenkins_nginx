@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('GitLoad') {
+            steps {
+               git branch: 'main', url: 'https://github.com/andruh8245/practic_jenkins_nginx.git'
+           }
+        }
+        stage('Build_Run') {
+            steps {
+               sh 'docker build -t nginx_my .'
+               sh 'docker run --name nginx -v $(pwd):/usr/share/nginx/html -d --rm -p 9889:80 nginx'
+               
+           }
+        }
+        stage('Verify') {
+            steps {
+               sh 'curl -s -o /dev/null -w "%{http_code}" http://192.168.160.30:9889/ | grep 200'
+           }
+        }
+    }
+    post {
+        always {
+             sh 'docker stop nginx'
+        }
+        failure {
+             emailext body: 'ERROR Build', subject: 'ERROR Build', to: 'andruh8245@gmail.com'
+        }
+        
+    }
+}
